@@ -18,10 +18,10 @@
   self = [super init];
   if(self)
   {
-    char *cpattern = [pattern UTF8String];
+    char *cpattern = (char *)[pattern UTF8String];
     options |= PCRE_UTF8 | PCRE_NO_UTF8_CHECK;
     char *errStr;
-    _pcre = pcre_compile2(cpattern, options, &_code, &errStr, &_offset, NULL);
+    _pcre = pcre_compile2(cpattern, options, &_code, (const char **)&errStr, &_offset, NULL);
     if(_pcre == NULL)
     {
       _error = [[OFString stringWithUTF8String:errStr] retain];
@@ -31,7 +31,7 @@
     {
       _error = nil;
       char *studyError;
-      _pcreExtra = pcre_study(_pcre, 0, &studyError);
+      _pcreExtra = pcre_study(_pcre, 0, (const char **)&studyError);
       if(studyError != NULL) if(_pcreExtra != NULL) { pcre_free_study(_pcreExtra); _pcreExtra = NULL; }
     }
   }
@@ -96,7 +96,7 @@
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 -(OFArray *)execute:(OFString *)string
 {
-  char *cString = [string UTF8String];
+  char *cString = (char *)[string UTF8String];
 
   int status = -1, maxVectors = 16, *vectors = NULL, slen = string.length;
   while((status == -1) && (maxVectors < 4096))
@@ -131,7 +131,7 @@
   int olen = string.length; if((index       ) >= olen) return [OFArray array];
   int slen = olen - index;  if((index + slen) >  olen) return [OFArray array];
   of_range_t range; range.location = index; range.length = slen;
-  char *cString = [[string substringWithRange:range] UTF8String];
+  char *cString = (char *)[[string substringWithRange:range] UTF8String];
 
   //nearly identical to above function
   int status = 0, maxVectors = 16, *vectors = NULL;
